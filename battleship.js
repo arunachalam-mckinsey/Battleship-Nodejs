@@ -9,10 +9,10 @@ let telemetryWorker;
 
 class Battleship {
     start() {
-        telemetryWorker = new Worker("./TelemetryClient/telemetryClient.js");   
+        telemetryWorker = new Worker("./TelemetryClient/telemetryClient.js");
 
         console.log("Starting...");
-        telemetryWorker.postMessage({eventName: 'ApplicationStarted', properties:  {Technology: 'Node.js'}});
+        telemetryWorker.postMessage({ eventName: 'ApplicationStarted', properties: { Technology: 'Node.js' } });
 
         console.log(cliColor.magenta("                                     |__"));
         console.log(cliColor.magenta("                                     |\\/"));
@@ -46,14 +46,18 @@ class Battleship {
         console.log("   \\    \\_/");
         console.log("    \"\"\"\"");
 
+        let step = 0;
         do {
+            step++;
+            console.log();
+            console.log(cliColor.yellow(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Step ${step}: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`));
             console.log();
             console.log("Player, it's your turn");
             console.log("Enter coordinates for your shot :");
             var position = Battleship.ParsePosition(readline.question());
             var isHit = gameController.CheckIsHit(this.enemyFleet, position);
 
-            telemetryWorker.postMessage({eventName: 'Player_ShootPosition', properties:  {Position: position.toString(), IsHit: isHit}});
+            telemetryWorker.postMessage({ eventName: 'Player_ShootPosition', properties: { Position: position.toString(), IsHit: isHit } });
 
             if (isHit) {
                 beep();
@@ -68,15 +72,17 @@ class Battleship {
                 console.log("                   \\  \\   /  /");
             }
 
-            console.log(isHit ? "Yeah ! Nice hit !" : "Miss");
+            console.log(isHit ? cliColor.red("Yeah ! Nice hit !") : cliColor.green("Miss"));
 
             var computerPos = this.GetRandomPosition();
             var isHit = gameController.CheckIsHit(this.myFleet, computerPos);
 
-            telemetryWorker.postMessage({eventName: 'Computer_ShootPosition', properties:  {Position: computerPos.toString(), IsHit: isHit}});
+            telemetryWorker.postMessage({ eventName: 'Computer_ShootPosition', properties: { Position: computerPos.toString(), IsHit: isHit } });
 
             console.log();
-            console.log(`Computer shot in ${computerPos.column}${computerPos.row} and ` + (isHit ? `has hit your ship !` : `miss`));
+            let compHitMessage = `Computer shot in ${computerPos.column}${computerPos.row} and ` + (isHit ? `has hit your ship !` : `miss`);
+            console.log(isHit ? cliColor.red(compHitMessage) : cliColor.green(compHitMessage));
+
             if (isHit) {
                 beep();
 
@@ -89,6 +95,8 @@ class Battleship {
                 console.log("                 -\\  \\     /  /-");
                 console.log("                   \\  \\   /  /");
             }
+            console.log(cliColor.yellow(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ End of Step ${step}: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~`));
+            console.log();
         }
         while (true);
     }
@@ -123,10 +131,10 @@ class Battleship {
             console.log();
             console.log(`Please enter the positions for the ${ship.name} (size: ${ship.size})`);
             for (var i = 1; i < ship.size + 1; i++) {
-                    console.log(`Enter position ${i} of ${ship.size} (i.e A3):`);
-                    const position = readline.question();
-                    telemetryWorker.postMessage({eventName: 'Player_PlaceShipPosition', properties:  {Position: position, Ship: ship.name, PositionInShip: i}});
-                    ship.addPosition(Battleship.ParsePosition(position));
+                console.log(`Enter position ${i} of ${ship.size} (i.e A3):`);
+                const position = readline.question();
+                telemetryWorker.postMessage({ eventName: 'Player_PlaceShipPosition', properties: { Position: position, Ship: ship.name, PositionInShip: i } });
+                ship.addPosition(Battleship.ParsePosition(position));
             }
         })
     }
