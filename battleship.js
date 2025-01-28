@@ -33,6 +33,26 @@ class Battleship {
         this.StartGame();
     }
 
+    hit() {
+        beep();
+
+        console.log(cliColor.red("                \\         .  ./"));
+        console.log(cliColor.red("              \\      .:\";'.:..\"   /"));
+        console.log(cliColor.red("                  (M^^.^~~:.'\")."));
+        console.log(cliColor.red("            -   (/  .    . . \\ \\)  -"));
+        console.log(cliColor.red("               ((| :. ~ ^  :. .|))"));
+        console.log(cliColor.red("            -   (\\- |  \\ /  |  /)  -"));
+        console.log(cliColor.red("                 -\\  \\     /  /-"));
+        console.log(cliColor.red("                   \\  \\   /  /"));
+    }
+
+    miss() {
+        console.log(cliColor.blue("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"));
+        console.log(cliColor.blue("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"));
+        console.log(cliColor.blue("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"));
+        console.log(cliColor.blue("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"));
+    }
+
     StartGame() {
         console.clear();
         console.log("                  __");
@@ -48,31 +68,25 @@ class Battleship {
 
         let step = 0;
         do {
+
             step++;
             console.log();
-            console.log(cliColor.yellow(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Step ${step}: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`));
+            console.log(cliColor.white(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Step ${step}: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`));
             console.log();
-            console.log("Player, it's your turn");
-            console.log("Enter coordinates for your shot :");
+            console.log(cliColor.yellow("Player, it's your turn"));
+            console.log(cliColor.yellow("Enter coordinates for your shot :"));
             var position = Battleship.ParsePosition(readline.question());
             var isHit = gameController.CheckIsHit(this.enemyFleet, position);
 
             telemetryWorker.postMessage({ eventName: 'Player_ShootPosition', properties: { Position: position.toString(), IsHit: isHit } });
 
             if (isHit) {
-                beep();
-
-                console.log("                \\         .  ./");
-                console.log("              \\      .:\";'.:..\"   /");
-                console.log("                  (M^^.^~~:.'\").");
-                console.log("            -   (/  .    . . \\ \\)  -");
-                console.log("               ((| :. ~ ^  :. .|))");
-                console.log("            -   (\\- |  \\ /  |  /)  -");
-                console.log("                 -\\  \\     /  /-");
-                console.log("                   \\  \\   /  /");
+                this.hit();
+            } else {
+                this.miss();
             }
 
-            console.log(isHit ? cliColor.red("Yeah ! Nice hit !") : cliColor.green("Miss"));
+            console.log(isHit ? cliColor.red("Yeah ! Nice hit !") : cliColor.blue("Miss"));
 
             var computerPos = this.GetRandomPosition();
             var isHit = gameController.CheckIsHit(this.myFleet, computerPos);
@@ -81,21 +95,14 @@ class Battleship {
 
             console.log();
             let compHitMessage = `Computer shot in ${computerPos.column}${computerPos.row} and ` + (isHit ? `has hit your ship !` : `miss`);
-            console.log(isHit ? cliColor.red(compHitMessage) : cliColor.green(compHitMessage));
+            console.log(isHit ? cliColor.red(compHitMessage) : cliColor.blue(compHitMessage));
 
             if (isHit) {
-                beep();
-
-                console.log("                \\         .  ./");
-                console.log("              \\      .:\";'.:..\"   /");
-                console.log("                  (M^^.^~~:.'\").");
-                console.log("            -   (/  .    . . \\ \\)  -");
-                console.log("               ((| :. ~ ^  :. .|))");
-                console.log("            -   (\\- |  \\ /  |  /)  -");
-                console.log("                 -\\  \\     /  /-");
-                console.log("                   \\  \\   /  /");
+                this.hit();
+            } else {
+                this.miss();
             }
-            console.log(cliColor.yellow(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ End of Step ${step}: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~`));
+            console.log(cliColor.white(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ End of Step ${step}: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~`));
             console.log();
         }
         while (true);
