@@ -9,7 +9,7 @@ let telemetryWorker;
 
 class Battleship {
     start() {
-        telemetryWorker = new Worker("./TelemetryClient/telemetryClient.js");   
+        telemetryWorker = new Worker("./TelemetryClient/telemetryClient.js");
 
         console.log("Starting...");
         telemetryWorker.postMessage({eventName: 'ApplicationStarted', properties:  {Technology: 'Node.js'}});
@@ -34,6 +34,9 @@ class Battleship {
     }
 
     StartGame() {
+        let enemyShipsSunk = [];
+        let computerShipsSunk = [];
+
         console.clear();
         console.log("                  __");
         console.log("                 /  \\");
@@ -51,9 +54,18 @@ class Battleship {
             console.log("Player, it's your turn");
             console.log("Enter coordinates for your shot :");
             var position = Battleship.ParsePosition(readline.question());
+            var isvalidEnemyPos = gameController.CheckValidPosition(position);
+
+            if(!isvalidEnemyPos)
+            {
+                    console.log("Invalid position, please try again");
+                    continue;
+                }
+
             var isHit = gameController.CheckIsHit(this.enemyFleet, position);
 
             telemetryWorker.postMessage({eventName: 'Player_ShootPosition', properties:  {Position: position.toString(), IsHit: isHit}});
+
 
             if (isHit) {
                 beep();
@@ -66,18 +78,48 @@ class Battleship {
                 console.log("            -   (\\- |  \\ /  |  /)  -");
                 console.log("                 -\\  \\     /  /-");
                 console.log("                   \\  \\   /  /");
+
+                if (this.enemyFleet.some(ship => ship.isSunk)) {
+                    console.log(cliColor.yellow("Sunk Ships: "));
+                    for (const ship of this.enemyFleet) {
+                        if (ship.isSunk) {
+                            console.log(cliColor.red(`You have sunk the ship ! : ${ship.name}`));
+                        }
+                    }
+                }
+                if (this.enemyFleet.some(ship => !ship.isSunk)) {
+                    console.log(cliColor.yellow("UnSunk Ships: "));
+                    for (const ship of this.enemyFleet) {
+                        if (!ship.isSunk) {
+                            console.log(cliColor.red(`Ship not sunk: ${ship.name}`));
+                        }
+                    }
+                }
+                // if(isHit.shipsSunk)
+                // {
+                //     computerShipsSunk.push(isHit.shipSize);
+                //     console.error(`You have sunk th ship ! : ${this.enemyFleet}`);
+
+                // }
+
             }
 
             console.log(isHit ? "Yeah ! Nice hit !" : "Miss");
 
             var computerPos = this.GetRandomPosition();
+            var isvalidCompPos = gameController.CheckValidPosition(computerPos);
+            if(!isvalidCompPos)
+                {
+                        console.log("Invalid position, please try again");
+                        continue;
+                    }
             var isHit = gameController.CheckIsHit(this.myFleet, computerPos);
 
             telemetryWorker.postMessage({eventName: 'Computer_ShootPosition', properties:  {Position: computerPos.toString(), IsHit: isHit}});
 
             console.log();
             console.log(`Computer shot in ${computerPos.column}${computerPos.row} and ` + (isHit ? `has hit your ship !` : `miss`));
-            if (isHit) {
+            if (isHit.isHit) {
                 beep();
 
                 console.log("                \\         .  ./");
@@ -88,6 +130,12 @@ class Battleship {
                 console.log("            -   (\\- |  \\ /  |  /)  -");
                 console.log("                 -\\  \\     /  /-");
                 console.log("                   \\  \\   /  /");
+
+                if(isHit.shipsSunk)
+                    {
+                        console.error(`Computer has sunk your ships ! : ${this.myFleet}`);
+
+                    }
             }
         }
         while (true);
@@ -134,27 +182,27 @@ class Battleship {
     InitializeEnemyFleet() {
         this.enemyFleet = gameController.InitializeShips();
 
-        this.enemyFleet[0].addPosition(new position(letters.B, 4));
-        this.enemyFleet[0].addPosition(new position(letters.B, 5));
-        this.enemyFleet[0].addPosition(new position(letters.B, 6));
-        this.enemyFleet[0].addPosition(new position(letters.B, 7));
-        this.enemyFleet[0].addPosition(new position(letters.B, 8));
+        this.enemyFleet[0].addPosition(new position(letters.B, 4, false));
+        this.enemyFleet[0].addPosition(new position(letters.B, 5, false));
+        this.enemyFleet[0].addPosition(new position(letters.B, 6, false));
+        this.enemyFleet[0].addPosition(new position(letters.B, 7, false));
+        this.enemyFleet[0].addPosition(new position(letters.B, 8, false));
 
-        this.enemyFleet[1].addPosition(new position(letters.E, 6));
-        this.enemyFleet[1].addPosition(new position(letters.E, 7));
-        this.enemyFleet[1].addPosition(new position(letters.E, 8));
-        this.enemyFleet[1].addPosition(new position(letters.E, 9));
+        this.enemyFleet[1].addPosition(new position(letters.E, 6, false));
+        this.enemyFleet[1].addPosition(new position(letters.E, 7, false));
+        this.enemyFleet[1].addPosition(new position(letters.E, 8, false));
+        this.enemyFleet[1].addPosition(new position(letters.E, 9, false));
 
-        this.enemyFleet[2].addPosition(new position(letters.A, 3));
-        this.enemyFleet[2].addPosition(new position(letters.B, 3));
-        this.enemyFleet[2].addPosition(new position(letters.C, 3));
+        this.enemyFleet[2].addPosition(new position(letters.A, 3, false));
+        this.enemyFleet[2].addPosition(new position(letters.B, 3, false));
+        this.enemyFleet[2].addPosition(new position(letters.C, 3, false));
 
-        this.enemyFleet[3].addPosition(new position(letters.F, 8));
-        this.enemyFleet[3].addPosition(new position(letters.G, 8));
-        this.enemyFleet[3].addPosition(new position(letters.H, 8));
+        this.enemyFleet[3].addPosition(new position(letters.F, 8, false));
+        this.enemyFleet[3].addPosition(new position(letters.G, 8, false));
+        this.enemyFleet[3].addPosition(new position(letters.H, 8, false));
 
-        this.enemyFleet[4].addPosition(new position(letters.C, 5));
-        this.enemyFleet[4].addPosition(new position(letters.C, 6));
+        this.enemyFleet[4].addPosition(new position(letters.C, 5, false));
+        this.enemyFleet[4].addPosition(new position(letters.C, 6, false));
     }
 }
 
