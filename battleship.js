@@ -53,6 +53,10 @@ class Battleship {
         console.log(cliColor.blue("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"));
     }
 
+    endGameMessage() {
+        console.log(cliColor.red("====== Press CTRL+C to exit the game ======"));
+    }
+
     StartGame() {
         console.clear();
         console.log("                  __");
@@ -70,9 +74,11 @@ class Battleship {
         do {
             if (gameController.isSunk(this.myFleet)) {
                 console.log(cliColor.red("You lost !"));
+                this.endGameMessage();
                 return;
             } else if (gameController.isSunk(this.enemyFleet)) {
                 console.log(cliColor.green("You won !"));
+                this.endGameMessage();
                 return;
             }
             step++;
