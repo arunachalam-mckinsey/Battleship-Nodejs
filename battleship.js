@@ -68,7 +68,13 @@ class Battleship {
 
         let step = 0;
         do {
-
+            if (gameController.isSunk(this.myFleet)) {
+                console.log(cliColor.red("You lost !"));
+                return;
+            } else if (gameController.isSunk(this.enemyFleet)) {
+                console.log(cliColor.green("You won !"));
+                return;
+            }
             step++;
             console.log();
             console.log(cliColor.white(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Step ${step}: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`));
