@@ -26,11 +26,10 @@ class GameController {
         response.isHit = true;
         ships.forEach(function (ship) {
             ship.positions.forEach(position => {
-                if (position.row == shot.row && position.column == shot.column)
-                {
+                if (position.row == shot.row && position.column == shot.column) {
+                    position.hit();
                     returnvalue = true;
-                    position.isHit = true;
-                };
+                }
             });
             if (ship.positions.every(position => position.isHit))
                 {
@@ -43,9 +42,6 @@ class GameController {
     }
 
     static CheckValidPosition(shot){
-
-        console.log(`row : ${shot.row} column : ${shot.column}`);
-
         if(shot.row < 1 || shot.row > 8)
             return false;
 
@@ -53,6 +49,24 @@ class GameController {
             return false;
 
         return true;
+    }
+
+    static isSunk(fleet) {
+        if (fleet == undefined)
+            throw "No ships defined";
+        let isSink = true;
+        for (const ship of fleet) {
+            for (const position of ship.positions) {
+                if (!position.isHit) {
+                    isSink = false;
+                    break;
+                }
+            }
+            if (!isSink) {
+                return isSink;
+            }
+        }
+        return isSink;
     }
 
     static isShipValid(ship) {

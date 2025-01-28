@@ -5,6 +5,10 @@ class Position {
         this.isHit = false;
     }
 
+    hit() {
+        this.isHit = true;
+    }
+
     toString() {
         return this.column.toString() + this.row.toString()
     }
