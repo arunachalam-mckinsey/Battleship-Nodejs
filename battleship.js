@@ -162,8 +162,8 @@ class Battleship {
     }
 
     InitializeGame() {
-        this.InitializeMyFleet();
         this.InitializeEnemyFleet();
+        this.InitializeMyFleet();
     }
 
     InitializeMyFleet() {
