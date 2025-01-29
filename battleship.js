@@ -8,7 +8,12 @@ const letters = require("./GameController/letters.js");
 let telemetryWorker;
 
 class Battleship {
-    start() {
+    start(showPosition) {
+        if (showPosition[0] === "s") {
+            this.show = true;
+        } else {
+            this.show = false;
+        }
         telemetryWorker = new Worker("./TelemetryClient/telemetryClient.js");
 
         console.log("Starting...");
@@ -205,7 +210,9 @@ class Battleship {
         }
 
         console.log("Enemy fleet has been positioned. Get ready to hit");
-        console.log(cliColor.black(this.enemyFleet.map((ship) => ship.positions.map((position) => position.toString()).join(", ")).join(" | ")));
+        if (this.show) {
+            console.log(this.enemyFleet.map((ship) => ship.positions.map((position) => position.toString()).join(", ")).join(" | "));
+        }
     }
 }
 
