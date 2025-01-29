@@ -75,9 +75,6 @@ class Battleship {
     }
 
     StartGame() {
-        let enemyShipsSunk = [];
-        let computerShipsSunk = [];
-
         console.clear();
         console.log("                  __");
         console.log("                 /  \\");
