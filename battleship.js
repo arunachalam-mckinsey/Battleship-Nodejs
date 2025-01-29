@@ -105,7 +105,7 @@ class Battleship {
             console.log();
             console.log(cliColor.white(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Step ${step}: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`));
             console.log();
-            console.log(cliColor.yellow("Player, it's your turn"));
+            console.log("Player, it's your turn");
             console.log(cliColor.yellow("Enter coordinates for your shot :"));
             var position = Battleship.ParsePosition(readline.question());
             var isvalidEnemyPos = gameController.CheckValidPosition(position);
@@ -130,12 +130,6 @@ class Battleship {
             console.log(isHit ? cliColor.red("Yeah ! Nice hit !") : cliColor.blue("Miss"));
 
             var computerPos = this.GetRandomPosition();
-            var isvalidCompPos = gameController.CheckValidPosition(computerPos);
-            if(!isvalidCompPos)
-                {
-                        console.log("Invalid position, please try again");
-                        continue;
-                    }
             var isHit = gameController.CheckIsHit(this.myFleet, computerPos);
 
             telemetryWorker.postMessage({ eventName: 'Computer_ShootPosition', properties: { Position: computerPos.toString(), IsHit: isHit } });
@@ -149,7 +143,6 @@ class Battleship {
             } else {
                 this.miss();
             }
-            console.log(cliColor.white(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ End of Step ${step}: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~`));
             console.log();
         }
         while (true);
@@ -193,30 +186,29 @@ class Battleship {
         })
     }
 
+    generateRandomNumber(max) {
+        return Math.floor(Math.random() * max);
+    }
+
     InitializeEnemyFleet() {
         this.enemyFleet = gameController.InitializeShips();
+        let alphabets = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
-        this.enemyFleet[0].addPosition(new position(letters.B, 4, false));
-        this.enemyFleet[0].addPosition(new position(letters.B, 5, false));
-        this.enemyFleet[0].addPosition(new position(letters.B, 6, false));
-        this.enemyFleet[0].addPosition(new position(letters.B, 7, false));
-        this.enemyFleet[0].addPosition(new position(letters.B, 8, false));
 
-        this.enemyFleet[1].addPosition(new position(letters.E, 6, false));
-        this.enemyFleet[1].addPosition(new position(letters.E, 7, false));
-        this.enemyFleet[1].addPosition(new position(letters.E, 8, false));
-        this.enemyFleet[1].addPosition(new position(letters.E, 9, false));
+        for (let i = 0; i < this.enemyFleet.length; i++) {
+            const random = alphabets[this.generateRandomNumber(alphabets.length)];
+            alphabets = alphabets.filter((_, index) => _ !== random);
+            
+            let start = this.generateRandomNumber(7-this.enemyFleet[i].size);
 
-        this.enemyFleet[2].addPosition(new position(letters.A, 3, false));
-        this.enemyFleet[2].addPosition(new position(letters.B, 3, false));
-        this.enemyFleet[2].addPosition(new position(letters.C, 3, false));
+            for (let j =0;j < this.enemyFleet[i].size; j++) {
+                let shipPosition = new position(letters.get(random), j+start+1, false);
+                this.enemyFleet[i].addPosition(shipPosition);
+            }
+        }
 
-        this.enemyFleet[3].addPosition(new position(letters.F, 8, false));
-        this.enemyFleet[3].addPosition(new position(letters.G, 8, false));
-        this.enemyFleet[3].addPosition(new position(letters.H, 8, false));
-
-        this.enemyFleet[4].addPosition(new position(letters.C, 5, false));
-        this.enemyFleet[4].addPosition(new position(letters.C, 6, false));
+        console.log("Enemy fleet has been positioned. Get ready to hit");
+        console.log(cliColor.black(this.enemyFleet.map((ship) => ship.positions.map((position) => position.toString()).join(", ")).join(" | ")));
     }
 }
 
