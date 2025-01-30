@@ -178,22 +178,59 @@ class Battleship {
 
         console.log("Please position your fleet (Game board size is from A to H and 1 to 8) :");
 
-        this.myFleet.forEach(function (ship) {
+        // this.myFleet.forEach(function (ship) {
+        for (const ship of this.myFleet) {
             console.log();
             console.log(`Please enter the positions for the ${ship.name} (size: ${ship.size})`);
             for (var i = 1; i < ship.size + 1; i++) {
                 console.log(`Enter position ${i} of ${ship.size} (i.e A3):`);
                 const position = readline.question();
-                telemetryWorker.postMessage({ eventName: 'Player_PlaceShipPosition', properties: { Position: position, Ship: ship.name, PositionInShip: i } });
-                ship.addPosition(Battleship.ParsePosition(position));
+                if (this.isValidPosition(position)) {
+                    telemetryWorker.postMessage({ eventName: 'Player_PlaceShipPosition', properties: { Position: position, Ship: ship.name, PositionInShip: i } });
+                    ship.addPosition(Battleship.ParsePosition(position));
+                } else {
+                    i--;
+                }
             }
-        })
+        }
+    // )
     }
 
     generateRandomNumber(max) {
         return Math.floor(Math.random() * max);
     }
 
+    isOverlapping(position) {
+        for (const ship of this.myFleet) {
+            for (const pos of ship.positions) {
+                if (pos.toString() === position) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    printAllShipPositions(fleet) {
+        console.log(cliColor.yellow("Your fleet positions:"));
+        for (const ship of fleet) {
+            console.log(cliColor.blue("Ship: " + ship.name, "Position: " + ship.positions.map((position) => position.toString()).join(", ")));
+        }
+    }
+
+    isValidPosition (position) {
+        if (!gameController.CheckValidPosition(Battleship.ParsePosition(position))) {
+            console.log(cliColor.red("Invalid position. Please try again"));
+            return false;
+        }
+        if (this.isOverlapping(position)) {
+            console.log(cliColor.red("This position is already in use. Please try again"));
+            this.printAllShipPositions(this.myFleet);
+            return false;
+        }
+        return true;
+    }
+    
     InitializeEnemyFleet() {
         this.enemyFleet = gameController.InitializeShips();
         let alphabets = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];

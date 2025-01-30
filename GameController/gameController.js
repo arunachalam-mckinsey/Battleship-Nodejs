@@ -42,7 +42,7 @@ class GameController {
     }
 
     static CheckValidPosition(shot){
-        if(shot.row < 1 || shot.row > 8)
+        if(shot.row < 1 || shot.row > 8 || isNaN(shot.row))
             return false;
 
         if(!letters.hasOwnProperty(shot.column))
