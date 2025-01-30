@@ -38,7 +38,7 @@ class Battleship {
         this.StartGame();
     }
 
-    hit() {
+    hit(isComputer = false) {
         beep();
 
         console.log(cliColor.red("                \\         .  ./"));
@@ -50,17 +50,19 @@ class Battleship {
         console.log(cliColor.red("                 -\\  \\     /  /-"));
         console.log(cliColor.red("                   \\  \\   /  /"));
 
-        if (this.enemyFleet.some(ship => ship.isSunk)) {
+        const fleet = isComputer ? this.myFleet : this.enemyFleet;
+
+        if (fleet.some(ship => ship.isSunk)) {
             console.log(cliColor.yellow("Sunk Ships: "));
-            for (const ship of this.enemyFleet) {
+            for (const ship of fleet) {
                 if (ship.isSunk) {
                     console.log(cliColor.red(`You have sunk the ship ! : ${ship.name}`));
                 }
             }
         }
-        if (this.enemyFleet.some(ship => !ship.isSunk)) {
+        if (fleet.some(ship => !ship.isSunk)) {
             console.log(cliColor.yellow("UnSunk Ships: "));
-            for (const ship of this.enemyFleet) {
+            for (const ship of fleet) {
                 if (!ship.isSunk) {
                     console.log(cliColor.red(`Ship not sunk: ${ship.name}`));
                 }
@@ -141,7 +143,7 @@ class Battleship {
             console.log(isHit ? cliColor.red(compHitMessage) : cliColor.blue(compHitMessage));
 
             if (isHit) {
-                this.hit();
+                this.hit(true);
             } else {
                 this.miss();
             }
